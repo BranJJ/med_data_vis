@@ -3,18 +3,24 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Import data
-df = pd.read_csv("medical_examination.csv")
 
-# Add 'overweight' column
-bmi = df["weight"]/ ((df["height"]/100) ** 2)
-df["overweight"] = bmi.apply(lambda x : 1 if x >25 else 0)
+def import_data():
+    # Import data
+    df = pd.read_csv("medical_examination.csv")
 
-# Normalize data by making 0 always good and 1 always bad. If the value of 'cholesterol' or 'gluc' is 1, make the value 0. If the value is more than 1, make the value 1.
-df["cholesterol"] = df["cholesterol"].apply(lambda x : 0 if x == 1 else 1)
-df["gluc"] = df["gluc"].apply(lambda x : 0 if x == 1 else 1)
+    # Add 'overweight' column
+    bmi = df["weight"]/ ((df["height"]/100) ** 2)
+    df["overweight"] = bmi.apply(lambda x : 1 if x >25 else 0)
+
+    # Normalize data by making 0 always good and 1 always bad. If the value of 'cholesterol' or 'gluc' is 1, make the value 0. If the value is more than 1, make the value 1.
+    df["cholesterol"] = df["cholesterol"].apply(lambda x : 0 if x == 1 else 1)
+    df["gluc"] = df["gluc"].apply(lambda x : 0 if x == 1 else 1)
+    return df
+
 # Draw Categorical Plot
-def draw_cat_plot(data):
+def draw_cat_plot():
+
+    data = import_data()
     # Create DataFrame for cat plot using `pd.melt` using just the values from 'cholesterol', 'gluc', 'smoke', 'alco', 'active', and 'overweight'.
     melted_data = pd.melt(data, id_vars=["cardio"], value_vars=["cholesterol", "gluc", "smoke", "alco", "active","overweight"])
 
@@ -36,10 +42,10 @@ def draw_cat_plot(data):
     fig.savefig('catplot.png')
     return fig
 
-draw_cat_plot(df)
-
 # Draw Heat Map
-def draw_heat_map(data):
+def draw_heat_map():
+
+    data = import_data()
     # Clean the data
     data_heat = data[
         (data["ap_lo"] <= data["ap_hi"]) &
@@ -65,5 +71,3 @@ def draw_heat_map(data):
     # Do not modify the next two lines
     fig.savefig('heatmap.png')
     return fig
-
-draw_heat_map(df)
